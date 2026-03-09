@@ -58,10 +58,11 @@ Plans:
   2. User can hear each theme's sounds during setup before committing to a selection
   3. User can run a list command to see available themes and which one is active
   4. User can run an uninstall command that removes all hooks from settings.json and deletes copied sound files from ~/.claude/sounds/
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md -- CLI scaffold with command routing, list command, and uninstall command
+- [ ] 03-02-PLAN.md -- Interactive setup wizard with theme picker, sound preview, and hook installation
 
 ## Progress
 
@@ -72,4 +73,4 @@ Phases execute in numeric order: 1 -> 2 -> 3
 |-------|----------------|--------|-----------|
 | 1. Audio and Config Foundation | 2/2 | Complete   | 2026-03-09 |
 | 2. Hook Events and Themes | 1/2 | In progress | - |
-| 3. Interactive CLI | 0/? | Not started | - |
+| 3. Interactive CLI | 0/2 | Not started | - |
