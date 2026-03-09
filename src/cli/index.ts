@@ -2,6 +2,7 @@
 
 import { listThemes } from './list';
 import { uninstall } from './uninstall';
+import { setup } from './setup';
 
 /**
  * CLI entry point. Routes argv to the appropriate command handler.
@@ -19,8 +20,7 @@ export async function main(args: string[]): Promise<void> {
       break;
 
     case 'setup':
-      // Placeholder -- wired in Plan 02
-      process.stdout.write('Setup not yet implemented.\n');
+      await setup();
       break;
 
     default:
