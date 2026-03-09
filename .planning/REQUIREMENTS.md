@@ -23,7 +23,7 @@
 - [ ] **HOOK-02**: Notification event plays a "needs input" sound
 - [ ] **HOOK-03**: SessionStart event plays a greeting sound
 - [ ] **HOOK-04**: PostToolUse event plays an error sound on tool failure
-- [ ] **HOOK-05**: Hook config merges into existing settings.json without clobbering
+- [x] **HOOK-05**: Hook config merges into existing settings.json without clobbering
 
 ### Themes
 
@@ -71,7 +71,7 @@
 | HOOK-02 | Phase 2 | Pending |
 | HOOK-03 | Phase 2 | Pending |
 | HOOK-04 | Phase 2 | Pending |
-| HOOK-05 | Phase 1 | Pending |
+| HOOK-05 | Phase 1 | Complete |
 | THEME-01 | Phase 2 | Pending |
 | THEME-02 | Phase 2 | Pending |
 | THEME-03 | Phase 2 | Pending |

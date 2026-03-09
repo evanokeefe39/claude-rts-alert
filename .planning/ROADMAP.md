@@ -12,7 +12,7 @@ claude-notify goes from zero to shippable in three phases. First, we establish c
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Audio and Config Foundation** - Cross-platform audio playback, bundled sounds, and safe settings.json merging
+- [x] **Phase 1: Audio and Config Foundation** - Cross-platform audio playback, bundled sounds, and safe settings.json merging (completed 2026-03-09)
 - [ ] **Phase 2: Hook Events and Themes** - Four hook event handlers and four complete theme sound packs
 - [ ] **Phase 3: Interactive CLI** - Setup wizard, sound preview, theme listing, and uninstall command
 
@@ -27,7 +27,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Sound files are loadable from the package's bundled assets directory
   3. Writing a hook entry to ~/.claude/settings.json preserves all existing user config and hooks
   4. Writing hooks to a fresh (nonexistent) settings.json creates a valid file
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 01-01-PLAN.md -- Project scaffold, audio playback module with play-sound, bundled asset resolution
@@ -70,6 +70,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Audio and Config Foundation | 0/2 | Planning complete | - |
+| 1. Audio and Config Foundation | 2/2 | Complete   | 2026-03-09 |
 | 2. Hook Events and Themes | 0/? | Not started | - |
 | 3. Interactive CLI | 0/? | Not started | - |
