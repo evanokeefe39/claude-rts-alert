@@ -27,11 +27,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Sound files are loadable from the package's bundled assets directory
   3. Writing a hook entry to ~/.claude/settings.json preserves all existing user config and hooks
   4. Writing hooks to a fresh (nonexistent) settings.json creates a valid file
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md -- Project scaffold, audio playback module with play-sound, bundled asset resolution
+- [ ] 01-02-PLAN.md -- Safe settings.json merge module (read, write, merge hooks without clobbering)
 
 ### Phase 2: Hook Events and Themes
 **Goal**: All four Claude Code hook events trigger the correct themed sound, and four complete theme packs exist with curated audio
@@ -70,6 +70,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Audio and Config Foundation | 0/? | Not started | - |
+| 1. Audio and Config Foundation | 0/2 | Planning complete | - |
 | 2. Hook Events and Themes | 0/? | Not started | - |
 | 3. Interactive CLI | 0/? | Not started | - |
