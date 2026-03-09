@@ -14,8 +14,8 @@
 
 ### Playback
 
-- [ ] **PLAY-01**: Audio plays cross-platform via play-sound package (Windows, macOS, Linux)
-- [ ] **PLAY-02**: Sound files are bundled as .wav/.mp3 inside the package
+- [x] **PLAY-01**: Audio plays cross-platform via play-sound package (Windows, macOS, Linux)
+- [x] **PLAY-02**: Sound files are bundled as .wav/.mp3 inside the package
 
 ### Hooks
 
@@ -65,8 +65,8 @@
 | CLI-02 | Phase 3 | Pending |
 | CLI-03 | Phase 3 | Pending |
 | CLI-04 | Phase 3 | Pending |
-| PLAY-01 | Phase 1 | Pending |
-| PLAY-02 | Phase 1 | Pending |
+| PLAY-01 | Phase 1 | Complete |
+| PLAY-02 | Phase 1 | Complete |
 | HOOK-01 | Phase 2 | Pending |
 | HOOK-02 | Phase 2 | Pending |
 | HOOK-03 | Phase 2 | Pending |
