@@ -43,11 +43,11 @@ Plans:
   3. SessionStart event triggers a greeting sound from the active theme
   4. PostToolUse event triggers an error sound when a tool fails
   5. Each of the four v1 themes (WC3 Orc, WC3 Human, AoE2, Classic Windows) contains all four event sounds and is selectable as the active theme
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md -- Theme registry, active theme config, and hook event handler wiring all 4 events to themed sound playback
+- [ ] 02-02-PLAN.md -- Generate 16 sound files (4 themes x 4 events) and integration test verifying full pipeline
 
 ### Phase 3: Interactive CLI
 **Goal**: Users can install, preview, select, list, and uninstall themes through a single npx command with an interactive setup experience
@@ -71,5 +71,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Audio and Config Foundation | 2/2 | Complete   | 2026-03-09 |
-| 2. Hook Events and Themes | 0/? | Not started | - |
+| 2. Hook Events and Themes | 0/2 | Not started | - |
 | 3. Interactive CLI | 0/? | Not started | - |
