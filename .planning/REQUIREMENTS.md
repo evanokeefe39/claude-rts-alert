@@ -27,10 +27,10 @@
 
 ### Themes
 
-- [ ] **THEME-01**: WC3 Orc Peon theme with 4 event sounds
-- [ ] **THEME-02**: WC3 Human Peasant theme with 4 event sounds
-- [ ] **THEME-03**: Age of Empires 2 theme with 4 event sounds
-- [ ] **THEME-04**: Classic Windows theme with 4 event sounds
+- [x] **THEME-01**: WC3 Orc Peon theme with 4 event sounds
+- [x] **THEME-02**: WC3 Human Peasant theme with 4 event sounds
+- [x] **THEME-03**: Age of Empires 2 theme with 4 event sounds
+- [x] **THEME-04**: Classic Windows theme with 4 event sounds
 
 ## v2 Requirements
 
@@ -72,10 +72,10 @@
 | HOOK-03 | Phase 2 | Complete |
 | HOOK-04 | Phase 2 | Complete |
 | HOOK-05 | Phase 1 | Complete |
-| THEME-01 | Phase 2 | Pending |
-| THEME-02 | Phase 2 | Pending |
-| THEME-03 | Phase 2 | Pending |
-| THEME-04 | Phase 2 | Pending |
+| THEME-01 | Phase 2 | Complete |
+| THEME-02 | Phase 2 | Complete |
+| THEME-03 | Phase 2 | Complete |
+| THEME-04 | Phase 2 | Complete |
 
 **Coverage:**
 - v1 requirements: 15 total
