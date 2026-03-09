@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
 import { listThemes } from './list';
-
-const COMMANDS = ['setup', 'list', 'uninstall'] as const;
+import { uninstall } from './uninstall';
 
 /**
  * CLI entry point. Routes argv to the appropriate command handler.
@@ -16,8 +15,7 @@ export async function main(args: string[]): Promise<void> {
       break;
 
     case 'uninstall':
-      // Placeholder -- wired in Task 2
-      process.stdout.write('Uninstall not yet implemented.\n');
+      await uninstall();
       break;
 
     case 'setup':
