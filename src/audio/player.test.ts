@@ -1,6 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import path from 'path';
-import { resolveAssetPath, playSound } from './player';
+import { resolveAssetPath } from './player';
+
+const mockPlay = vi.hoisted(() =>
+  vi.fn((_filepath: string, cb: (err: Error | null) => void) => {
+    cb(null);
+  })
+);
+
+vi.mock('play-sound', () => {
+  return {
+    default: () => ({
+      play: mockPlay,
+    }),
+  };
+});
 
 describe('resolveAssetPath', () => {
   it('returns an absolute path for an existing asset file', () => {
@@ -23,27 +37,12 @@ describe('resolveAssetPath', () => {
 
 describe('playSound', () => {
   beforeEach(() => {
-    vi.restoreAllMocks();
+    mockPlay.mockClear();
   });
 
   it('calls play-sound play method with the resolved path', async () => {
-    const mockPlay = vi.fn((_filepath: string, cb: (err: Error | null) => void) => {
-      cb(null);
-    });
-
-    vi.mock('play-sound', () => {
-      return {
-        default: () => ({
-          play: (_filepath: string, cb: (err: Error | null) => void) => {
-            mockPlay(_filepath, cb);
-          },
-        }),
-      };
-    });
-
-    // Re-import to pick up mock
-    const { playSound: playSoundMocked } = await import('./player');
-    await playSoundMocked('placeholder.wav');
+    const { playSound } = await import('./player');
+    await playSound('placeholder.wav');
 
     expect(mockPlay).toHaveBeenCalledTimes(1);
     const calledPath = mockPlay.mock.calls[0][0];
@@ -52,6 +51,7 @@ describe('playSound', () => {
   });
 
   it('rejects with an error when file does not exist', async () => {
+    const { playSound } = await import('./player');
     await expect(playSound('nonexistent.wav')).rejects.toThrow();
   });
 });
