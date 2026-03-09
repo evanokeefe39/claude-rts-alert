@@ -1,0 +1,1 @@
+export { handleHookEvent } from './handler';
