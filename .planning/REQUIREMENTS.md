@@ -9,8 +9,8 @@
 
 - [ ] **CLI-01**: User can run interactive setup that presents theme choices
 - [ ] **CLI-02**: User can preview each theme's sounds before selecting
-- [ ] **CLI-03**: User can list available themes without installing
-- [ ] **CLI-04**: User can uninstall to remove all hooks and sound files
+- [x] **CLI-03**: User can list available themes without installing
+- [x] **CLI-04**: User can uninstall to remove all hooks and sound files
 
 ### Playback
 
@@ -63,8 +63,8 @@
 |-------------|-------|--------|
 | CLI-01 | Phase 3 | Pending |
 | CLI-02 | Phase 3 | Pending |
-| CLI-03 | Phase 3 | Pending |
-| CLI-04 | Phase 3 | Pending |
+| CLI-03 | Phase 3 | Complete |
+| CLI-04 | Phase 3 | Complete |
 | PLAY-01 | Phase 1 | Complete |
 | PLAY-02 | Phase 1 | Complete |
 | HOOK-01 | Phase 2 | Complete |
