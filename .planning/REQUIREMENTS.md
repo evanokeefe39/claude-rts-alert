@@ -19,10 +19,10 @@
 
 ### Hooks
 
-- [ ] **HOOK-01**: Stop event plays a "task complete" sound
-- [ ] **HOOK-02**: Notification event plays a "needs input" sound
-- [ ] **HOOK-03**: SessionStart event plays a greeting sound
-- [ ] **HOOK-04**: PostToolUse event plays an error sound on tool failure
+- [x] **HOOK-01**: Stop event plays a "task complete" sound
+- [x] **HOOK-02**: Notification event plays a "needs input" sound
+- [x] **HOOK-03**: SessionStart event plays a greeting sound
+- [x] **HOOK-04**: PostToolUse event plays an error sound on tool failure
 - [x] **HOOK-05**: Hook config merges into existing settings.json without clobbering
 
 ### Themes
@@ -67,10 +67,10 @@
 | CLI-04 | Phase 3 | Pending |
 | PLAY-01 | Phase 1 | Complete |
 | PLAY-02 | Phase 1 | Complete |
-| HOOK-01 | Phase 2 | Pending |
-| HOOK-02 | Phase 2 | Pending |
-| HOOK-03 | Phase 2 | Pending |
-| HOOK-04 | Phase 2 | Pending |
+| HOOK-01 | Phase 2 | Complete |
+| HOOK-02 | Phase 2 | Complete |
+| HOOK-03 | Phase 2 | Complete |
+| HOOK-04 | Phase 2 | Complete |
 | HOOK-05 | Phase 1 | Complete |
 | THEME-01 | Phase 2 | Pending |
 | THEME-02 | Phase 2 | Pending |
