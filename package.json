@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Audible feedback for Claude Code using retro game sounds",
   "main": "dist/index.js",
+  "bin": {
+    "claude-notify": "dist/cli/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run"
