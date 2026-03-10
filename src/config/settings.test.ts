@@ -9,7 +9,7 @@ describe('settings', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'claude-notify-test-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'claude-rts-alert-test-'));
   });
 
   afterEach(() => {
@@ -63,13 +63,13 @@ describe('settings', () => {
 
   describe('mergeHooks', () => {
     const notifyHook: HookEntry = {
-      type: 'command',
-      command: 'node /path/to/claude-notify/handler.js',
+      matcher: '',
+      hooks: [{ type: 'command', command: 'node /path/to/claude-rts-alert/handler.js' }],
     };
 
     const otherHook: HookEntry = {
-      type: 'command',
-      command: 'echo hello',
+      matcher: '',
+      hooks: [{ type: 'command', command: 'echo hello' }],
     };
 
     it('returns settings with new hooks when existing is empty', () => {
@@ -102,10 +102,10 @@ describe('settings', () => {
       expect(stopHooks).toHaveLength(2);
     });
 
-    it('replaces existing claude-notify hooks with new ones', () => {
+    it('replaces existing claude-rts-alert hooks with new ones', () => {
       const oldNotifyHook: HookEntry = {
-        type: 'command',
-        command: 'node /old/path/claude-notify/old-handler.js',
+        matcher: '',
+        hooks: [{ type: 'command', command: 'node /old/path/claude-rts-alert/old-handler.js' }],
       };
       const existing = {
         hooks: {
@@ -128,7 +128,7 @@ describe('settings', () => {
       };
       const result = mergeHooks(existing, {
         Stop: [notifyHook],
-        Notification: [{ type: 'command' as const, command: 'node /path/to/claude-notify/notify.js' }],
+        Notification: [{ matcher: '', hooks: [{ type: 'command' as const, command: 'node /path/to/claude-rts-alert/notify.js' }] }],
       });
       const hooks = (result as any).hooks;
       expect(hooks.Stop).toHaveLength(2);
@@ -136,7 +136,7 @@ describe('settings', () => {
     });
 
     it('preserves hooks for events not in newHooks', () => {
-      const sessionHook: HookEntry = { type: 'command', command: 'echo session' };
+      const sessionHook: HookEntry = { matcher: '', hooks: [{ type: 'command', command: 'echo session' }] };
       const existing = {
         hooks: {
           SessionStart: [sessionHook],

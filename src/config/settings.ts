@@ -1,10 +1,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-export type HookEntry = {
+export type HookCommand = {
   type: 'command';
   command: string;
-  matcher?: string;
+};
+
+export type HookEntry = {
+  matcher: string;
+  hooks: HookCommand[];
 };
 
 /**
@@ -47,8 +51,8 @@ export function writeSettings(settingsPath: string, data: Record<string, unknown
 /**
  * Merge new hook entries into existing settings.
  * - Preserves all non-hook keys
- * - Preserves existing hooks from other sources (commands not containing "claude-notify")
- * - Replaces existing claude-notify hooks with the new ones
+ * - Preserves existing hooks from other sources (commands not containing "claude-rts-alert")
+ * - Replaces existing claude-rts-alert hooks with the new ones
  * - Preserves hooks for events not mentioned in newHooks
  */
 export function mergeHooks(
@@ -63,9 +67,9 @@ export function mergeHooks(
   for (const [event, entries] of Object.entries(newHooks)) {
     const currentEntries = existingHooks[event] ?? [];
 
-    // Keep entries that are NOT from claude-notify
+    // Keep entries that are NOT from claude-rts-alert
     const preserved = currentEntries.filter(
-      (entry) => !entry.command.includes('claude-notify'),
+      (entry) => !entry.hooks?.some((h) => h.command?.includes('claude-rts-alert')),
     );
 
     // Append new entries after preserved ones
