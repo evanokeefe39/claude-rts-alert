@@ -28,7 +28,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/evano/claude-rts-alert"
+    "url": "https://github.com/evanokeefe39/claude-rts-alert"
   },
   "dependencies": {
     "@inquirer/select": "^5.1.0",
