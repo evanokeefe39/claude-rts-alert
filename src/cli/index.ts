@@ -25,7 +25,7 @@ export async function main(args: string[]): Promise<void> {
 
     default:
       process.stderr.write(
-        `Usage: claude-notify <command>\n\nCommands:\n  setup       Configure themes and install hooks (default)\n  list        Show available themes\n  uninstall   Remove all hooks and sound files\n`,
+        `Usage: claude-rts-alert <command>\n\nCommands:\n  setup       Configure themes and install hooks (default)\n  list        Show available themes\n  uninstall   Remove all hooks and sound files\n`,
       );
       break;
   }

@@ -32,10 +32,10 @@ afterEach(() => {
 });
 
 describe('THEMES constant', () => {
-  const expectedThemes: ThemeName[] = ['wc3-orc', 'wc3-human', 'aoe2', 'classic-windows'];
+  const expectedThemes: ThemeName[] = ['wc3-orc', 'wc3-human', 'aoe2'];
   const expectedEvents: HookEvent[] = ['stop', 'notification', 'session-start', 'post-tool-use'];
 
-  it('contains all 4 themes', () => {
+  it('contains all 3 themes', () => {
     for (const theme of expectedThemes) {
       expect(THEMES).toHaveProperty(theme);
     }
@@ -65,8 +65,7 @@ describe('THEME_NAMES', () => {
     expect(THEME_NAMES).toContain('wc3-orc');
     expect(THEME_NAMES).toContain('wc3-human');
     expect(THEME_NAMES).toContain('aoe2');
-    expect(THEME_NAMES).toContain('classic-windows');
-    expect(THEME_NAMES).toHaveLength(4);
+    expect(THEME_NAMES).toHaveLength(3);
   });
 });
 

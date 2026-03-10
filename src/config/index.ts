@@ -1,2 +1,2 @@
 export { readSettings, writeSettings, mergeHooks } from './settings';
-export type { HookEntry } from './settings';
+export type { HookEntry, HookCommand } from './settings';

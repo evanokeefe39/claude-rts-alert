@@ -19,7 +19,7 @@ describe('theme sound file resolution (integration)', () => {
     }
   }
 
-  it('covers all 16 theme-event combinations', () => {
-    expect(THEME_NAMES.length * events.length).toBe(16);
+  it('covers all 12 theme-event combinations', () => {
+    expect(THEME_NAMES.length * events.length).toBe(12);
   });
 });

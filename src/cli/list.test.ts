@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('../themes', () => ({
-  THEME_NAMES: ['wc3-orc', 'wc3-human', 'aoe2', 'classic-windows'],
+  THEME_NAMES: ['wc3-orc', 'wc3-human', 'aoe2'],
   getActiveTheme: vi.fn(() => 'aoe2'),
 }));
 
@@ -23,12 +23,11 @@ describe('listThemes', () => {
     vi.restoreAllMocks();
   });
 
-  it('outputs all 4 theme names', () => {
+  it('outputs all 3 theme names', () => {
     listThemes();
     expect(output).toContain('wc3-orc');
     expect(output).toContain('wc3-human');
     expect(output).toContain('aoe2');
-    expect(output).toContain('classic-windows');
   });
 
   it('marks the active theme with [active] suffix', () => {
@@ -51,7 +50,7 @@ describe('listThemes', () => {
     listThemes();
     // Split on newline, filter out empty trailing line
     const lines = output.split('\n').filter((l) => l.length > 0);
-    expect(lines).toHaveLength(4);
+    expect(lines).toHaveLength(3);
     for (const line of lines) {
       expect(line).toMatch(/^  \S/);
     }

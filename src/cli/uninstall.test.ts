@@ -1,107 +1,111 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+
+const mockRemoveInstalledFiles = vi.hoisted(() => vi.fn());
+const mockCleanupLegacy = vi.hoisted(() => vi.fn());
+
+vi.mock('../installer', () => ({
+  removeInstalledFiles: mockRemoveInstalledFiles,
+  cleanupLegacy: mockCleanupLegacy,
+}));
+
 import { uninstall } from './uninstall';
 
 describe('uninstall', () => {
   let tmpDir: string;
   let settingsPath: string;
-  let soundsDir: string;
-  let configDir: string;
   let output: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'claude-notify-uninstall-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'claude-rts-alert-uninstall-'));
     settingsPath = path.join(tmpDir, 'settings.json');
-    soundsDir = path.join(tmpDir, 'sounds');
-    configDir = path.join(tmpDir, 'config');
     output = '';
-    // Capture stdout
-    const origWrite = process.stdout.write.bind(process.stdout);
-    process.stdout.write = ((chunk: string | Uint8Array) => {
+    vi.spyOn(process.stdout, 'write').mockImplementation((chunk: string | Uint8Array) => {
       output += chunk.toString();
       return true;
-    }) as typeof process.stdout.write;
+    });
+    mockRemoveInstalledFiles.mockReset();
+    mockCleanupLegacy.mockReset();
   });
 
   afterEach(() => {
-    // Restore stdout (vitest handles this, but be safe)
+    vi.restoreAllMocks();
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it('removes claude-notify hooks from settings.json while preserving others', async () => {
+  it('removes claude-rts-alert hooks from settings.json while preserving others', async () => {
     const settings = {
       theme: 'dark',
       hooks: {
         Stop: [
-          { type: 'command', command: 'echo done' },
-          { type: 'command', command: 'node /path/to/claude-notify/handler.js stop' },
+          { hooks: [{ type: 'command', command: 'echo done' }] },
+          { hooks: [{ type: 'command', command: 'node ~/.claude/hooks/claude-rts-alert.js # claude-rts-alert' }] },
         ],
         Notification: [
-          { type: 'command', command: 'node /path/to/claude-notify/handler.js notification' },
+          { hooks: [{ type: 'command', command: 'node ~/.claude/hooks/claude-rts-alert.js # claude-rts-alert' }] },
         ],
       },
     };
     fs.writeFileSync(settingsPath, JSON.stringify(settings));
 
-    await uninstall(settingsPath, soundsDir, configDir);
+    await uninstall(settingsPath);
 
     const result = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
     expect(result.theme).toBe('dark');
-    // Stop should only have the non-claude-notify hook
-    expect(result.hooks.Stop).toEqual([{ type: 'command', command: 'echo done' }]);
-    // Notification had only claude-notify hooks, so the key should be removed
+    expect(result.hooks.Stop).toEqual([{ hooks: [{ type: 'command', command: 'echo done' }] }]);
     expect(result.hooks.Notification).toBeUndefined();
   });
 
-  it('removes hooks key entirely when all hooks are claude-notify', async () => {
+  it('also removes legacy claude-notify hooks', async () => {
     const settings = {
       hooks: {
         Stop: [
-          { type: 'command', command: 'node /path/to/claude-notify/handler.js stop' },
+          { hooks: [{ type: 'command', command: 'node /old/path/claude-notify/handler.js' }] },
         ],
       },
     };
     fs.writeFileSync(settingsPath, JSON.stringify(settings));
 
-    await uninstall(settingsPath, soundsDir, configDir);
+    await uninstall(settingsPath);
+
+    const result = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+    expect(result.hooks).toBeUndefined();
+  });
+
+  it('removes hooks key entirely when all hooks are ours', async () => {
+    const settings = {
+      hooks: {
+        Stop: [
+          { hooks: [{ type: 'command', command: 'node ~/.claude/hooks/claude-rts-alert.js # claude-rts-alert' }] },
+        ],
+      },
+    };
+    fs.writeFileSync(settingsPath, JSON.stringify(settings));
+
+    await uninstall(settingsPath);
 
     const result = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
     expect(result.hooks).toBeUndefined();
   });
 
   it('handles missing settings.json gracefully', async () => {
-    // settingsPath does not exist -- should not throw
-    await expect(uninstall(settingsPath, soundsDir, configDir)).resolves.toBeUndefined();
+    await expect(uninstall(settingsPath)).resolves.toBeUndefined();
   });
 
-  it('deletes sounds directory if it exists', async () => {
-    fs.mkdirSync(soundsDir, { recursive: true });
-    fs.writeFileSync(path.join(soundsDir, 'test.wav'), 'data');
-
-    await uninstall(settingsPath, soundsDir, configDir);
-
-    expect(fs.existsSync(soundsDir)).toBe(false);
+  it('calls removeInstalledFiles', async () => {
+    await uninstall(settingsPath);
+    expect(mockRemoveInstalledFiles).toHaveBeenCalledOnce();
   });
 
-  it('deletes config directory if it exists', async () => {
-    fs.mkdirSync(configDir, { recursive: true });
-    fs.writeFileSync(path.join(configDir, 'config.json'), '{}');
-
-    await uninstall(settingsPath, soundsDir, configDir);
-
-    expect(fs.existsSync(configDir)).toBe(false);
-  });
-
-  it('handles missing sound and config directories gracefully', async () => {
-    // Neither dir exists -- should not throw
-    await expect(uninstall(settingsPath, soundsDir, configDir)).resolves.toBeUndefined();
+  it('calls cleanupLegacy', async () => {
+    await uninstall(settingsPath);
+    expect(mockCleanupLegacy).toHaveBeenCalledWith(settingsPath);
   });
 
   it('prints confirmation message', async () => {
-    await uninstall(settingsPath, soundsDir, configDir);
-
+    await uninstall(settingsPath);
     expect(output).toContain('uninstalled');
   });
 });

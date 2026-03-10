@@ -28,7 +28,7 @@ export async function handleHookEvent(
   const event = EVENT_MAP[eventName];
 
   if (!event) {
-    process.stderr.write(`claude-notify: unknown hook event "${eventName}"\n`);
+    process.stderr.write(`claude-rts-alert: unknown hook event "${eventName}"\n`);
     return;
   }
 
@@ -46,7 +46,7 @@ export async function handleHookEvent(
     await playSound(soundFile);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    process.stderr.write(`claude-notify: failed to play sound: ${message}\n`);
+    process.stderr.write(`claude-rts-alert: failed to play sound: ${message}\n`);
   }
 }
 
@@ -58,6 +58,6 @@ if (require.main === module) {
     toolError: process.env.CLAUDE_HOOK_TOOL_OUTPUT,
   };
   handleHookEvent(eventName, context).catch((err) => {
-    process.stderr.write(`claude-notify: ${err}\n`);
+    process.stderr.write(`claude-rts-alert: ${err}\n`);
   });
 }

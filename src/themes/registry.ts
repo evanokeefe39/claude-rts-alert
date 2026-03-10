@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 
-export type ThemeName = 'wc3-orc' | 'wc3-human' | 'aoe2' | 'classic-windows';
+export type ThemeName = 'wc3-orc' | 'wc3-human' | 'aoe2';
 export type HookEvent = 'stop' | 'notification' | 'session-start' | 'post-tool-use';
 
 /**
@@ -28,19 +28,13 @@ export const THEMES: Record<ThemeName, Record<HookEvent, string>> = {
     'session-start': 'aoe2/greeting.wav',
     'post-tool-use': 'aoe2/error.wav',
   },
-  'classic-windows': {
-    'stop': 'classic-windows/task-complete.wav',
-    'notification': 'classic-windows/needs-input.wav',
-    'session-start': 'classic-windows/greeting.wav',
-    'post-tool-use': 'classic-windows/error.wav',
-  },
 };
 
 /** Array of all valid theme names. */
 export const THEME_NAMES: ThemeName[] = Object.keys(THEMES) as ThemeName[];
 
 const DEFAULT_THEME: ThemeName = 'wc3-orc';
-const DEFAULT_CONFIG_PATH = path.join(os.homedir(), '.claude-notify', 'config.json');
+const DEFAULT_CONFIG_PATH = path.join(os.homedir(), '.claude', 'claude-rts-alert', 'config.json');
 
 /**
  * Look up the sound file path for a given theme and event.
