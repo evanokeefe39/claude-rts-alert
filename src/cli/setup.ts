@@ -28,6 +28,7 @@ const HOOK_SCRIPT_PATH = path.join(os.homedir(), '.claude', 'hooks', 'claude-rts
 export interface SetupOptions {
   settingsPath?: string;
   configPath?: string;
+  theme?: string;
 }
 
 /**
@@ -35,7 +36,6 @@ export interface SetupOptions {
  * copies all runtime files, and installs hooks into Claude Code settings.json.
  */
 export async function setup(opts: SetupOptions = {}): Promise<void> {
-  const { default: select } = await import('@inquirer/select');
   const settingsPath = opts.settingsPath ?? DEFAULT_SETTINGS_PATH;
   const configPath = opts.configPath ?? DEFAULT_CONFIG_PATH;
 
@@ -45,6 +45,20 @@ export async function setup(opts: SetupOptions = {}): Promise<void> {
     process.stdout.write('Migrating from previous install...\n');
     cleanupLegacy(settingsPath);
   }
+
+  // Non-interactive mode: --theme flag provided
+  if (opts.theme) {
+    const themeName = opts.theme as ThemeName;
+    if (!THEME_NAMES.includes(themeName)) {
+      process.stderr.write(`Unknown theme: ${opts.theme}\nAvailable themes: ${THEME_NAMES.join(', ')}\n`);
+      process.exitCode = 1;
+      return;
+    }
+    installTheme(themeName, configPath, settingsPath);
+    return;
+  }
+
+  const { default: select } = await import('@inquirer/select');
 
   process.stdout.write('claude-rts-alert setup\n\n');
   process.stdout.write('Choose a sound theme for Claude Code notifications:\n\n');
@@ -89,34 +103,37 @@ export async function setup(opts: SetupOptions = {}): Promise<void> {
     }
 
     if (action === 'yes') {
-      // 1. Copy all runtime files (hook script, sounds, config, commands, package.json)
-      installAll();
-
-      // 2. Set active theme in config
-      setActiveTheme(theme, configPath);
-
-      // 3. Build hook entries pointing to the installed hook script
-      const hookCommand = `node "${HOOK_SCRIPT_PATH}" # claude-rts-alert`;
-      const newHooks: Record<string, HookEntry[]> = {};
-
-      for (const event of HOOK_EVENTS) {
-        const claudeKey = CLAUDE_EVENT_KEYS[event];
-        const cmd: HookCommand = { type: 'command', command: hookCommand };
-        const entry: HookEntry = { matcher: '', hooks: [cmd] };
-        newHooks[claudeKey] = [entry];
-      }
-
-      // 4. Read, merge, write settings
-      const existing = readSettings(settingsPath);
-      const merged = mergeHooks(existing, newHooks);
-      writeSettings(settingsPath, merged);
-
-      const displayName = THEME_DISPLAY_NAMES[theme];
-      process.stdout.write(`\nTheme '${displayName}' installed! Claude Code will now play sounds on events.\n`);
-      process.stdout.write('Run `claude-rts-alert list` to see themes or `claude-rts-alert uninstall` to remove.\n');
-
+      installTheme(theme, configPath, settingsPath);
       confirmed = true;
     }
     // action === 'retry' loops back
   }
+}
+
+function installTheme(theme: ThemeName, configPath: string, settingsPath: string): void {
+  // 1. Copy all runtime files (hook script, sounds, config, commands, package.json)
+  installAll();
+
+  // 2. Set active theme in config
+  setActiveTheme(theme, configPath);
+
+  // 3. Build hook entries pointing to the installed hook script
+  const hookCommand = `node "${HOOK_SCRIPT_PATH}" # claude-rts-alert`;
+  const newHooks: Record<string, HookEntry[]> = {};
+
+  for (const event of HOOK_EVENTS) {
+    const claudeKey = CLAUDE_EVENT_KEYS[event];
+    const cmd: HookCommand = { type: 'command', command: hookCommand };
+    const entry: HookEntry = { matcher: '', hooks: [cmd] };
+    newHooks[claudeKey] = [entry];
+  }
+
+  // 4. Read, merge, write settings
+  const existing = readSettings(settingsPath);
+  const merged = mergeHooks(existing, newHooks);
+  writeSettings(settingsPath, merged);
+
+  const displayName = THEME_DISPLAY_NAMES[theme];
+  process.stdout.write(`\nTheme '${displayName}' installed! Claude Code will now play sounds on events.\n`);
+  process.stdout.write('Run `claude-rts-alert list` to see themes or `claude-rts-alert uninstall` to remove.\n');
 }

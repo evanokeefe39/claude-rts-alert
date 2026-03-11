@@ -10,6 +10,10 @@ import { setup } from './setup';
 export async function main(args: string[]): Promise<void> {
   const command = args[0] ?? 'setup';
 
+  // Parse --theme flag from anywhere in args
+  const themeIdx = args.indexOf('--theme');
+  const theme = themeIdx !== -1 ? args[themeIdx + 1] : undefined;
+
   switch (command) {
     case 'list':
       listThemes();
@@ -20,12 +24,12 @@ export async function main(args: string[]): Promise<void> {
       break;
 
     case 'setup':
-      await setup();
+      await setup({ theme });
       break;
 
     default:
       process.stderr.write(
-        `Usage: claude-rts-alert <command>\n\nCommands:\n  setup       Configure themes and install hooks (default)\n  list        Show available themes\n  uninstall   Remove all hooks and sound files\n`,
+        `Usage: claude-rts-alert <command>\n\nCommands:\n  setup [--theme <name>]  Configure themes and install hooks (default)\n  list                   Show available themes\n  uninstall              Remove all hooks and sound files\n\nThemes: wc3-orc, wc3-human, aoe2\n`,
       );
       break;
   }
