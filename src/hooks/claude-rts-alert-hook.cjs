@@ -6,7 +6,7 @@
 // Usage: node claude-rts-alert.js <event>
 //   event: SessionStart | Stop | Notification | PostToolUse
 
-const { exec, spawn } = require('child_process');
+const { exec, spawnSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -54,12 +54,11 @@ function playSound(soundPath) {
     const escaped = soundPath.replace(/'/g, "''");
     const psCmd = `(New-Object System.Media.SoundPlayer '${escaped}').PlaySync()`;
     log(`PLAY ${soundPath}`);
-    const child = spawn('powershell', ['-NoProfile', '-Command', psCmd], {
-      detached: true,
+    spawnSync('powershell', ['-NoProfile', '-Command', psCmd], {
       stdio: 'ignore',
       windowsHide: true,
+      timeout: 10000,
     });
-    child.unref();
     return;
   }
 
@@ -86,7 +85,7 @@ if (!soundName) {
   process.exit(0);
 }
 
-// PostToolUse: only play on tool errors (read stdin to check)
+// PostToolUse: play on tool errors or AskUserQuestion (read stdin to check)
 if (eventName === 'PostToolUse') {
   let input = '';
   const timeout = setTimeout(() => process.exit(0), 3000);
@@ -97,6 +96,12 @@ if (eventName === 'PostToolUse') {
     clearTimeout(timeout);
     try {
       const data = JSON.parse(input);
+      if (data.tool_name === 'AskUserQuestion') {
+        log('AskUserQuestion detected — playing needs-input');
+        const theme = getActiveTheme();
+        playSound(path.join(SOUNDS_DIR, theme, 'needs-input.wav'));
+        return;
+      }
       if (!data.tool_error) process.exit(0);
       log('PostToolUse error detected');
     } catch {
