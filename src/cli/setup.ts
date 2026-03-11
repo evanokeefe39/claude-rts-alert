@@ -117,12 +117,12 @@ function installTheme(theme: ThemeName, configPath: string, settingsPath: string
   // 2. Set active theme in config
   setActiveTheme(theme, configPath);
 
-  // 3. Build hook entries pointing to the installed hook script
-  const hookCommand = `node "${HOOK_SCRIPT_PATH}" # claude-rts-alert`;
+  // 3. Build hook entries — pass event name as CLI arg
   const newHooks: Record<string, HookEntry[]> = {};
 
   for (const event of HOOK_EVENTS) {
     const claudeKey = CLAUDE_EVENT_KEYS[event];
+    const hookCommand = `node "${HOOK_SCRIPT_PATH}" ${claudeKey} # claude-rts-alert`;
     const cmd: HookCommand = { type: 'command', command: hookCommand };
     const entry: HookEntry = { matcher: '', hooks: [cmd] };
     newHooks[claudeKey] = [entry];

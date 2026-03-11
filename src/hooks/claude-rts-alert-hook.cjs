@@ -2,20 +2,21 @@
 // claude-rts-alert hook — zero-dependency CJS script
 // Installed to ~/.claude/hooks/claude-rts-alert.js
 // Plays themed RTS sounds for Claude Code hook events.
+//
+// Usage: node claude-rts-alert.js <event>
+//   event: SessionStart | Stop | Notification | PostToolUse
 
 const { exec, spawn } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-// --- Event mapping ---
-// Maps Claude Code hook event names to sound filenames (without extension)
+// Maps event arg to sound filename (without extension)
 const EVENT_SOUND_MAP = {
   'Stop': 'task-complete',
   'Notification': 'needs-input',
-  'SubagentStop': 'task-complete',
   'SessionStart': 'greeting',
-  'PostToolUse': 'error', // only on tool errors
+  'PostToolUse': 'error',
 };
 
 const DEFAULT_THEME = 'wc3-orc';
@@ -24,18 +25,12 @@ const CONFIG_PATH = path.join(HOME, '.claude', 'claude-rts-alert', 'config.json'
 const SOUNDS_DIR = path.join(HOME, '.claude', 'sounds', 'claude-rts-alert');
 const LOG_PATH = path.join(HOME, '.claude', 'claude-rts-alert', 'debug.log');
 
-// --- Logging ---
-
 function log(msg) {
   try {
     const ts = new Date().toISOString();
     fs.appendFileSync(LOG_PATH, `[${ts}] ${msg}\n`);
-  } catch {
-    // logging is best-effort
-  }
+  } catch {}
 }
-
-// --- Helpers ---
 
 function getActiveTheme() {
   try {
@@ -49,7 +44,7 @@ function getActiveTheme() {
 
 function playSound(soundPath) {
   if (!fs.existsSync(soundPath)) {
-    log(`SKIP sound not found: ${soundPath}`);
+    log(`SKIP not found: ${soundPath}`);
     return;
   }
 
@@ -58,7 +53,7 @@ function playSound(soundPath) {
   if (platform === 'win32') {
     const escaped = soundPath.replace(/'/g, "''");
     const psCmd = `(New-Object System.Media.SoundPlayer '${escaped}').PlaySync()`;
-    log(`PLAY ${soundPath} via SoundPlayer`);
+    log(`PLAY ${soundPath}`);
     const child = spawn('powershell', ['-NoProfile', '-Command', psCmd], {
       detached: true,
       stdio: 'ignore',
@@ -75,55 +70,42 @@ function playSound(soundPath) {
     cmd = `aplay "${soundPath}" 2>/dev/null || paplay "${soundPath}" 2>/dev/null || mpv --no-video "${soundPath}" 2>/dev/null`;
   }
 
-  log(`PLAY ${soundPath} via ${platform === 'darwin' ? 'afplay' : 'aplay/paplay/mpv'}`);
-  const child = exec(cmd, () => {}); // silent failures
+  log(`PLAY ${soundPath}`);
+  const child = exec(cmd, () => {});
   child.unref();
 }
 
 // --- Main ---
 
-const eventName = process.env.CLAUDE_HOOK_EVENT_NAME || '';
+const eventName = process.argv[2] || '';
 const soundName = EVENT_SOUND_MAP[eventName];
 
-log(`EVENT ${eventName} -> sound: ${soundName || '(none)'}`);
+log(`EVENT ${eventName} -> ${soundName || '(none)'}`);
 
 if (!soundName) {
   process.exit(0);
 }
 
-// PostToolUse requires reading stdin to check for errors
+// PostToolUse: only play on tool errors (read stdin to check)
 if (eventName === 'PostToolUse') {
   let input = '';
-
-  // Timeout guard: if stdin doesn't close within 3s, exit silently
-  // Prevents hanging on Windows/Git Bash pipe issues
-  const stdinTimeout = setTimeout(() => {
-    log('PostToolUse stdin timeout — exiting');
-    process.exit(0);
-  }, 3000);
+  const timeout = setTimeout(() => process.exit(0), 3000);
 
   process.stdin.setEncoding('utf8');
   process.stdin.on('data', (chunk) => (input += chunk));
   process.stdin.on('end', () => {
-    clearTimeout(stdinTimeout);
+    clearTimeout(timeout);
     try {
       const data = JSON.parse(input);
-      if (!data.tool_error) {
-        log('PostToolUse no error — skipping');
-        process.exit(0);
-      }
-      log('PostToolUse tool_error detected');
+      if (!data.tool_error) process.exit(0);
+      log('PostToolUse error detected');
     } catch {
-      log('PostToolUse stdin parse error — skipping');
       process.exit(0);
     }
-
     const theme = getActiveTheme();
-    const soundPath = path.join(SOUNDS_DIR, theme, soundName + '.wav');
-    playSound(soundPath);
+    playSound(path.join(SOUNDS_DIR, theme, soundName + '.wav'));
   });
 } else {
   const theme = getActiveTheme();
-  const soundPath = path.join(SOUNDS_DIR, theme, soundName + '.wav');
-  playSound(soundPath);
+  playSound(path.join(SOUNDS_DIR, theme, soundName + '.wav'));
 }
