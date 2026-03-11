@@ -22,6 +22,18 @@ const DEFAULT_THEME = 'wc3-orc';
 const HOME = os.homedir();
 const CONFIG_PATH = path.join(HOME, '.claude', 'claude-rts-alert', 'config.json');
 const SOUNDS_DIR = path.join(HOME, '.claude', 'sounds', 'claude-rts-alert');
+const LOG_PATH = path.join(HOME, '.claude', 'claude-rts-alert', 'debug.log');
+
+// --- Logging ---
+
+function log(msg) {
+  try {
+    const ts = new Date().toISOString();
+    fs.appendFileSync(LOG_PATH, `[${ts}] ${msg}\n`);
+  } catch {
+    // logging is best-effort
+  }
+}
 
 // --- Helpers ---
 
@@ -36,15 +48,18 @@ function getActiveTheme() {
 }
 
 function playSound(soundPath) {
-  if (!fs.existsSync(soundPath)) return;
+  if (!fs.existsSync(soundPath)) {
+    log(`SKIP sound not found: ${soundPath}`);
+    return;
+  }
 
   const platform = process.platform;
-  let cmd;
 
   if (platform === 'win32') {
     const escaped = soundPath.replace(/'/g, "''");
-    const psCmd = `Add-Type -AssemblyName presentationCore; $p = New-Object System.Windows.Media.MediaPlayer; $p.Open([Uri]'${escaped}'); $p.Play(); Start-Sleep -Seconds 3; $p.Close()`;
-    const child = spawn('powershell', ['-Command', psCmd], {
+    const psCmd = `(New-Object System.Media.SoundPlayer '${escaped}').PlaySync()`;
+    log(`PLAY ${soundPath} via SoundPlayer`);
+    const child = spawn('powershell', ['-NoProfile', '-Command', psCmd], {
       detached: true,
       stdio: 'ignore',
       windowsHide: true,
@@ -53,12 +68,14 @@ function playSound(soundPath) {
     return;
   }
 
+  let cmd;
   if (platform === 'darwin') {
     cmd = `afplay "${soundPath}"`;
   } else {
     cmd = `aplay "${soundPath}" 2>/dev/null || paplay "${soundPath}" 2>/dev/null || mpv --no-video "${soundPath}" 2>/dev/null`;
   }
 
+  log(`PLAY ${soundPath} via ${platform === 'darwin' ? 'afplay' : 'aplay/paplay/mpv'}`);
   const child = exec(cmd, () => {}); // silent failures
   child.unref();
 }
@@ -68,8 +85,9 @@ function playSound(soundPath) {
 const eventName = process.env.CLAUDE_HOOK_EVENT_NAME || '';
 const soundName = EVENT_SOUND_MAP[eventName];
 
+log(`EVENT ${eventName} -> sound: ${soundName || '(none)'}`);
+
 if (!soundName) {
-  // Unknown event — exit silently
   process.exit(0);
 }
 
@@ -79,7 +97,10 @@ if (eventName === 'PostToolUse') {
 
   // Timeout guard: if stdin doesn't close within 3s, exit silently
   // Prevents hanging on Windows/Git Bash pipe issues
-  const stdinTimeout = setTimeout(() => process.exit(0), 3000);
+  const stdinTimeout = setTimeout(() => {
+    log('PostToolUse stdin timeout — exiting');
+    process.exit(0);
+  }, 3000);
 
   process.stdin.setEncoding('utf8');
   process.stdin.on('data', (chunk) => (input += chunk));
@@ -87,12 +108,13 @@ if (eventName === 'PostToolUse') {
     clearTimeout(stdinTimeout);
     try {
       const data = JSON.parse(input);
-      // Only play error sound when there's an actual tool error
       if (!data.tool_error) {
+        log('PostToolUse no error — skipping');
         process.exit(0);
       }
+      log('PostToolUse tool_error detected');
     } catch {
-      // Can't parse stdin — exit silently
+      log('PostToolUse stdin parse error — skipping');
       process.exit(0);
     }
 
@@ -101,7 +123,6 @@ if (eventName === 'PostToolUse') {
     playSound(soundPath);
   });
 } else {
-  // Non-stdin events: play immediately
   const theme = getActiveTheme();
   const soundPath = path.join(SOUNDS_DIR, theme, soundName + '.wav');
   playSound(soundPath);
