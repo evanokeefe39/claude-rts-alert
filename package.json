@@ -1,6 +1,6 @@
 {
   "name": "claude-rts-alert",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Audible feedback for Claude Code using retro game sounds",
   "main": "dist/index.js",
   "bin": {
