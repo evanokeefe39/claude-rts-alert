@@ -23,7 +23,7 @@ const CLAUDE_EVENT_KEYS: Record<HookEvent, string> = {
 
 const DEFAULT_SETTINGS_PATH = path.join(os.homedir(), '.claude', 'settings.json');
 const DEFAULT_CONFIG_PATH = path.join(os.homedir(), '.claude', 'claude-rts-alert', 'config.json');
-const HOOK_SCRIPT_PATH = path.join(os.homedir(), '.claude', 'hooks', 'claude-rts-alert.js');
+const HOOK_SCRIPT_PATH = path.join(os.homedir(), '.claude', 'hooks', 'claude-rts-alert.js').replace(/\\/g, '/');
 
 export interface SetupOptions {
   settingsPath?: string;
