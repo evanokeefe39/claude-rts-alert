@@ -3,7 +3,7 @@
 // Installed to ~/.claude/hooks/claude-rts-alert.js
 // Plays themed RTS sounds for Claude Code hook events.
 
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -43,8 +43,17 @@ function playSound(soundPath) {
 
   if (platform === 'win32') {
     const escaped = soundPath.replace(/'/g, "''");
-    cmd = `powershell -Command "Add-Type -AssemblyName presentationCore; $p = New-Object System.Windows.Media.MediaPlayer; $p.Open([Uri]'${escaped}'); $p.Play(); Start-Sleep -Seconds 3; $p.Close()"`;
-  } else if (platform === 'darwin') {
+    const psCmd = `Add-Type -AssemblyName presentationCore; $p = New-Object System.Windows.Media.MediaPlayer; $p.Open([Uri]'${escaped}'); $p.Play(); Start-Sleep -Seconds 3; $p.Close()`;
+    const child = spawn('powershell', ['-Command', psCmd], {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true,
+    });
+    child.unref();
+    return;
+  }
+
+  if (platform === 'darwin') {
     cmd = `afplay "${soundPath}"`;
   } else {
     cmd = `aplay "${soundPath}" 2>/dev/null || paplay "${soundPath}" 2>/dev/null || mpv --no-video "${soundPath}" 2>/dev/null`;
